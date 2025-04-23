@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -8,6 +8,6 @@
 
 @layer theme {
   .dark {
-    --color-bgContrast: #66C8B6;
+    --color-bgContrast: #66c8b6;
   }
 }
