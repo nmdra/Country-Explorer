@@ -1,0 +1,64 @@
+services:
+  backend:
+    image: ghcr.io/nmdra/country-explorer-backend
+    build:
+      context: .
+      target: development 
+    container_name: country-backend
+    hostname: country-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - country-network
+
+  frontend:
+    image: ghcr.io/nmdra/country-explorer-frontend
+    build:
+      context: .
+      target: production 
+    container_name: country-frontend
+    hostname: country-frontend
+    ports:
+      - "80:80" 
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: country-postgres
+    hostname: postgres
+    restart: always
+    environment:
+      postgres_db: countries
+      postgres_user: postgres
+      postgres_password: postgres
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - country-network
+
+  redis:
+    image: redis:alpine
+    container_name: country-redis
+    hostname: redis
+    restart: always
+    # ports:
+    #   - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - country-network
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  country-network:
+    driver: bridge
+ 
