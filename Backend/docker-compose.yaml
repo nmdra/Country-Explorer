@@ -1,0 +1,73 @@
+services:
+  backend:
+    image: nmdra/country-explorer-backend
+    build:
+      context: .
+      target: development 
+    container_name: country-backend
+    hostname: country-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - port=5000
+      - database_url=postgres://postgres:postgres@postgres:5432/countries
+      - redis_url=redis://redis:6379
+      - jwt_secret=super_secret
+    # env_file:
+    #   - .env
+    command: yarn dev
+    develop:
+      watch:
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: yarn.lock
+        - action: sync+restart
+          path: src/index.js
+          target: /app/index.js
+        - action: sync
+          path: src
+          target: /app
+          ignore:
+            - node_modules
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - country-network
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: country-postgres
+    hostname: postgres
+    restart: always
+    environment:
+      postgres_db: countries
+      postgres_user: postgres
+      postgres_password: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - country-network
+
+  redis:
+    image: redis:alpine
+    container_name: country-redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - country-network
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  country-network:
+    driver: bridge
+  

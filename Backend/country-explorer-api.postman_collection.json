@@ -1,0 +1,126 @@
+{
+  "info": {
+    "_postman_id": "cfe28d04-5eaf-4da4-93d7-123456abcdef",
+    "name": "Country Explorer API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "http://localhost:5000/api/auth/register",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "register"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "http://localhost:5000/api/auth/login",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "login"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Get Favorites",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "http://localhost:5000/api/user/favorites",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "user", "favorites"]
+        }
+      }
+    },
+    {
+      "name": "Add Favorite",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:5000/api/user/favorites",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "user", "favorites"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cca3\": \"LKA\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Remove Favorite",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "http://localhost:5000/api/user/favorites/LKA",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "user", "favorites", "LKA"]
+        }
+      }
+    },
+    {
+      "name": "Track Trending Country",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": {
+          "raw": "http://localhost:5000/api/trending/track",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "trending", "track"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cca3\": \"JPN\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Get Trending",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/trending",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "trending"]
+        }
+      }
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
