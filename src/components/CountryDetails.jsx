@@ -10,7 +10,16 @@ import {
   FaMapMarkedAlt,
 } from "react-icons/fa";
 import CountryMap from "./CountryMap";
+import CountryIntroduction from "./CountryIntroduction";
 
+// Skeleton component
+const Skeleton = ({ className = "" }) => (
+  <div
+    className={`bg-gray-200 dark:bg-gray-700 animate-pulse rounded ${className}`}
+  />
+);
+
+// Fetch functions
 const fetchCountryDetails = async (code) => {
   const res = await fetch(`https://restcountries.com/v3.1/alpha/${code}`);
   const data = await res.json();
@@ -25,6 +34,7 @@ const fetchBorderCountries = async (codes) => {
   return res.json();
 };
 
+// Main component
 const CountryDetails = () => {
   const { code } = useParams();
 
@@ -43,7 +53,23 @@ const CountryDetails = () => {
     enabled: !!country?.borders?.length,
   });
 
-  if (isLoading) return <p className="p-4">Loading...</p>;
+  if (isLoading) {
+    return (
+      <div className="p-6 max-w-5xl mx-auto space-y-6">
+        <Skeleton className="w-full h-60" />
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
+          <Skeleton className="h-8 w-2/3" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <Skeleton key={i} className="h-5 w-full" />
+            ))}
+          </div>
+        </div>
+        <Skeleton className="w-full h-72" />
+      </div>
+    );
+  }
+
   if (isError)
     return <p className="p-4 text-red-500">Error loading country.</p>;
 
@@ -58,11 +84,17 @@ const CountryDetails = () => {
         />
       </div>
 
+      {/* Introduction from Wikipedia */}
+      <CountryIntroduction
+        nameCommon={country.name.common}
+        nameOfficial={country.name.official}
+      />
+
       {/* Country Info */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
-          {country.name.official}
-        </h2>
+        <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
+          Summary
+        </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
           <p>
@@ -129,7 +161,11 @@ const CountryDetails = () => {
             Border Countries
           </h3>
           {isLoadingBorders ? (
-            <p>Loading borders...</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {borderCountries.map((border) => (

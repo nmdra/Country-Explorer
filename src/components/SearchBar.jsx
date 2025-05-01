@@ -1,14 +1,43 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+const RECENT_KEY = "recentCountrySearches";
 
 const SearchBar = ({ searchTerm, setSearchTerm, suggestions }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [recentSearches, setRecentSearches] = useState([]);
   const listRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    setRecentSearches(saved);
+  }, []);
+
+  useEffect(() => {
+    setActiveIndex(-1);
     setShowSuggestions(searchTerm.length > 0);
-    setActiveIndex(-1); // reset highlight on search change
-  }, [searchTerm]);
+
+    const exactMatch = suggestions.find(
+      (s) => s.name.common.toLowerCase() === searchTerm.toLowerCase()
+    );
+    if (exactMatch) {
+      setShowSuggestions(false);
+      handleNavigate(exactMatch);
+    }
+  }, [searchTerm, suggestions]);
+
+  const handleNavigate = (country) => {
+    const updated = [
+      country,
+      ...recentSearches.filter((r) => r.cca3 !== country.cca3),
+    ].slice(0, 5); // keep latest 5
+    localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+    setRecentSearches(updated);
+
+    navigate(`/country/${country.cca3}`);
+  };
 
   const handleKeyDown = (e) => {
     if (!showSuggestions || suggestions.length === 0) return;
@@ -23,14 +52,19 @@ const SearchBar = ({ searchTerm, setSearchTerm, suggestions }) => {
           ? suggestions.length - 1
           : (prev - 1 + suggestions.length) % suggestions.length
       );
-    } else if (e.key === "Enter") {
-      if (activeIndex >= 0) {
-        setSearchTerm(suggestions[activeIndex].name.common);
-        setShowSuggestions(false);
-      }
+    } else if (e.key === "Enter" && activeIndex >= 0) {
+      const selected = suggestions[activeIndex];
+      setSearchTerm(selected.name.common);
+      setShowSuggestions(false);
+      handleNavigate(selected);
     } else if (e.key === "Escape") {
       setShowSuggestions(false);
     }
+  };
+
+  const handleBlur = () => {
+    // Delay hiding to allow item click
+    setTimeout(() => setShowSuggestions(false), 100);
   };
 
   return (
@@ -42,30 +76,54 @@ const SearchBar = ({ searchTerm, setSearchTerm, suggestions }) => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         onFocus={() => setShowSuggestions(true)}
-        onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
+        onBlur={handleBlur}
         onKeyDown={handleKeyDown}
       />
-      {showSuggestions && suggestions.length > 0 && (
+
+      {showSuggestions && (
         <ul
           ref={listRef}
-          className="absolute z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-1 w-full rounded shadow"
+          className="absolute z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-1 w-full rounded shadow max-h-64 overflow-y-auto"
         >
-          {suggestions.map((s, idx) => (
-            <li
-              key={idx}
-              className={`px-4 py-2 cursor-pointer ${
-                idx === activeIndex
-                  ? "bg-gray-100 dark:bg-gray-700"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700"
-              }`}
-              onMouseDown={() => {
-                setSearchTerm(s.name.common);
-                setShowSuggestions(false);
-              }}
-            >
-              {s.name.common}
-            </li>
-          ))}
+          {searchTerm.length > 0 && suggestions.length > 0 ? (
+            suggestions.map((s, idx) => (
+              <li
+                key={s.cca3}
+                className={`px-4 py-2 cursor-pointer ${
+                  idx === activeIndex
+                    ? "bg-gray-100 dark:bg-gray-700"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                onMouseDown={() => {
+                  setSearchTerm(s.name.common);
+                  setShowSuggestions(false);
+                  handleNavigate(s);
+                }}
+              >
+                {s.name.common}
+              </li>
+            ))
+          ) : recentSearches.length > 0 ? (
+            <>
+              <li className="px-4 py-2 text-xs text-gray-500 uppercase">
+                Recent Searches
+              </li>
+              {recentSearches.map((r) => (
+                <li
+                  key={r.cca3}
+                  className="px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onMouseDown={() => {
+                    setSearchTerm(r.name.common);
+                    handleNavigate(r);
+                  }}
+                >
+                  {r.name.common}
+                </li>
+              ))}
+            </>
+          ) : (
+            <li className="px-4 py-2 text-gray-500">No results</li>
+          )}
         </ul>
       )}
     </div>

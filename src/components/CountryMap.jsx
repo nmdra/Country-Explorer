@@ -11,12 +11,12 @@ const CountryMap = ({ latlng, name, flagUrl }) => {
     iconSize: [40, 30], // width, height
     iconAnchor: [20, 30], // point of the icon which will correspond to marker's location
     popupAnchor: [0, -30],
-    className: "shadow-md rounded", // optional Tailwind class for image shape
+    className: "shadow-md rounded",
   });
 
   return (
-    <div className="mt-6">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+    <div className="mt-1">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
         Location Map
       </h3>
       <MapContainer
