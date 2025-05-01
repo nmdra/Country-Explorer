@@ -3,13 +3,13 @@ import { useState } from "react";
 import CountryCard from "./CountryCard";
 import SkeletonCard from "./SkeletonCard";
 import SearchBar from "./SearchBar";
-import RegionFilter from "./RegionFilter";
+import FilterBar from "./FilterBar"; // 🆕 supports both region + language
 
 const ITEMS_PER_PAGE = 24;
 
 const fetchCountries = async () => {
   const res = await fetch(
-    "https://restcountries.com/v3.1/all?fields=name,flags,region"
+    "https://restcountries.com/v3.1/all?fields=name,flags,region,languages,cca3"
   );
   return res.json();
 };
@@ -22,16 +22,37 @@ const CountryList = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [regionFilter, setRegionFilter] = useState("All");
+  const [languageFilter, setLanguageFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Build region/language lists
+  const regions = Array.from(
+    new Set(data?.map((c) => c.region).filter(Boolean))
+  ).sort();
+
+  const languages = Array.from(
+    new Set(
+      data
+        ?.flatMap((c) => Object.values(c.languages || {}))
+        .filter((lang) => typeof lang === "string")
+    )
+  ).sort();
+
+  // Filter countries
   const filteredCountries =
     data?.filter((country) => {
       const matchesSearch = country.name.common
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
+
       const matchesRegion =
         regionFilter === "All" || country.region === regionFilter;
-      return matchesSearch && matchesRegion;
+
+      const matchesLanguage =
+        languageFilter === "All" ||
+        Object.values(country.languages || {}).includes(languageFilter);
+
+      return matchesSearch && matchesRegion && matchesLanguage;
     }) || [];
 
   const totalPages = Math.ceil(filteredCountries.length / ITEMS_PER_PAGE);
@@ -49,26 +70,35 @@ const CountryList = () => {
           .slice(0, 5)
       : [];
 
-  const regions = Array.from(
-    new Set(data?.map((c) => c.region).filter(Boolean))
-  );
-
   return (
     <div className="space-y-6">
+      {/* Filters */}
       <div className="flex flex-col md:flex-row justify-between gap-4">
         <SearchBar
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
+          setSearchTerm={(term) => {
+            setSearchTerm(term);
+            setCurrentPage(1);
+          }}
           suggestions={suggestions}
         />
-        <RegionFilter
+        <FilterBar
           regionFilter={regionFilter}
-          setRegionFilter={setRegionFilter}
+          setRegionFilter={(val) => {
+            setRegionFilter(val);
+            setCurrentPage(1);
+          }}
+          languageFilter={languageFilter}
+          setLanguageFilter={(val) => {
+            setLanguageFilter(val);
+            setCurrentPage(1);
+          }}
           regions={regions}
+          languages={languages}
         />
       </div>
 
-      {/* Grid / Error / Empty */}
+      {/* Country Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
