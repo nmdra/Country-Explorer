@@ -16,10 +16,10 @@ COPY . .
 
 RUN yarn build
 
-FROM caddy:2.10.0-alpine
+FROM caddy:2.10.0-alpine AS production
 
 # Copy the Caddyfile
-COPY ./Caddyfile /etc/caddy/Caddyfile
+# COPY ./Caddyfile /etc/caddy/Caddyfile
 
 COPY --from=builder /app/dist /srv/
 

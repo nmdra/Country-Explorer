@@ -4,7 +4,7 @@ FROM base AS development
 
 WORKDIR /app
 
-COPY ./src/package.json ./src/yarn.lock ./
+COPY package.json yarn.lock ./
 
 RUN yarn global add nodemon && yarn install --verbose
 
