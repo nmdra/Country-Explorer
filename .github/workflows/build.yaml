@@ -48,7 +48,7 @@ jobs:
             *.labels.org.opencontainers.image.revision=${{ github.sha }}
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max
-            *.args.VERSION=${{ env.GIT_TAG }}
         env:
             VITE_API_BASE_URL: ${{ env.VITE_API_BASE_URL }}
             VITE_COUNTRY_API_URL: ${{ env.VITE_COUNTRY_API_URL }}
+            VERSION: ${{ env.GIT_TAG }}

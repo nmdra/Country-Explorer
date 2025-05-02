@@ -16,9 +16,7 @@ const TrendingCountries = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/trending?limit=5`
-        );
+        const res = await fetch(`/api/trending?limit=5`);
         const data = await res.json();
         const sortedTrending = (data.trending || []).sort(
           (a, b) => b.count - a.count

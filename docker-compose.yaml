@@ -2,7 +2,7 @@ services:
   backend:
     image: ghcr.io/nmdra/country-explorer-backend
     build:
-      context: .
+      context: ./Backend
       target: development 
     container_name: country-backend
     hostname: country-backend
@@ -19,12 +19,14 @@ services:
   frontend:
     image: ghcr.io/nmdra/country-explorer-frontend
     build:
-      context: .
+      context: ./Frontend
       target: production 
     container_name: country-frontend
     hostname: country-frontend
     ports:
       - "80:80" 
+    networks:
+      - country-network
 
   postgres:
     image: postgres:17-alpine
@@ -32,9 +34,9 @@ services:
     hostname: postgres
     restart: always
     environment:
-      postgres_db: countries
-      postgres_user: postgres
-      postgres_password: postgres
+      POSTGRES_DB: countries
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     # ports:
     #   - "5432:5432"
     volumes:
@@ -47,6 +49,12 @@ services:
     container_name: country-redis
     hostname: redis
     restart: always
+    command: >
+      redis-server
+      --save 60 1
+      --appendonly yes
+      --appendfsync everysec
+      --loglevel warning
     # ports:
     #   - "6379:6379"
     volumes:
