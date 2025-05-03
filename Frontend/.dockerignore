@@ -1,0 +1,37 @@
+# Ignore test directories and files
+**/*.test.js
+**/*.test.jsx
+**/*.spec.js
+**/*.spec.jsx
+**/tests
+**/test
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# Ignore node_modules
+node_modules/
+
+# Ignore build output
+/dist
+/build
+/.next
+/.nuxt
+/out
+
+# Ignore log files
+*.log
+
+# Ignore environment files
+.env
+.env.local
+.env.*.local
+
+# Ignore Dockerfile itself
+Dockerfile
+
+# Ignore other unnecessary files
+.vscode
+.idea
+*.md
