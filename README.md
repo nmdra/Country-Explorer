@@ -11,6 +11,11 @@ A modern, responsive web app to explore country details with maps, flags, and fa
     - [External APIs](#external-apis)
     - [Internal APIs](#internal-apis)
   - [Getting Started (Local Development)](#getting-started-local-development)
+  - [Testing](#testing)
+    - [Libraries \& Frameworks Used](#libraries--frameworks-used)
+    - [Running Tests](#running-tests)
+    - [Test Coverage](#test-coverage)
+    - [Debugging Tests](#debugging-tests)
   - [Production Deployment](#production-deployment)
     - [Enviroment Variables](#enviroment-variables)
     - [Docker Compose Configuration](#docker-compose-configuration)
@@ -115,6 +120,38 @@ npm install
 # 3. Start the frontend
 npm run dev
 ````
+
+## Testing
+
+### Libraries & Frameworks Used
+
+* **Vitest**: A fast unit test framework for JavaScript/TypeScript. It supports features like mocking, assertions, and coverage reporting.
+* **React Testing Library**: A set of utilities for testing React components. It encourages testing components the way users would interact with them.
+* **Jest**: If you're using Jest, it will handle running tests, assertions, and coverage.
+* **Cypress**: For E2E and UI Testing
+
+### Running Tests
+
+1. **Install Dependencies**:
+   Run `npm install` to install necessary dependencies.
+
+2. **Run Tests**:
+   Execute `npm test` to run all tests.
+
+3. **Run Tests in CI**:
+   Tests are automatically run on every push/pull request in CI tools like GitHub Actions.
+
+### Test Coverage
+
+Check the test coverage with:
+
+```bash
+npm run test -- --coverage
+```
+
+### Debugging Tests
+
+Use `npm test -- --watch` to run tests in watch mode for debugging.
 
 ## Production Deployment
 
