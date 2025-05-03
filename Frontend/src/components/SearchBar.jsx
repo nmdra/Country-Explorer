@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaSearch } from "react-icons/fa";
 
 const RECENT_KEY = "recentCountrySearches";
 
@@ -20,7 +21,7 @@ const SearchBar = ({ searchTerm, setSearchTerm, suggestions }) => {
     setShowSuggestions(searchTerm.length > 0);
 
     const exactMatch = suggestions.find(
-      (s) => s.name.common.toLowerCase() === searchTerm.toLowerCase(),
+      (s) => s.name.common.toLowerCase() === searchTerm.toLowerCase()
     );
     if (exactMatch) {
       setShowSuggestions(false);
@@ -32,10 +33,9 @@ const SearchBar = ({ searchTerm, setSearchTerm, suggestions }) => {
     const updated = [
       country,
       ...recentSearches.filter((r) => r.cca3 !== country.cca3),
-    ].slice(0, 5); // keep latest 5
+    ].slice(0, 5);
     localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
     setRecentSearches(updated);
-
     navigate(`/country/${country.cca3}`);
   };
 
@@ -50,7 +50,7 @@ const SearchBar = ({ searchTerm, setSearchTerm, suggestions }) => {
       setActiveIndex((prev) =>
         prev === -1
           ? suggestions.length - 1
-          : (prev - 1 + suggestions.length) % suggestions.length,
+          : (prev - 1 + suggestions.length) % suggestions.length
       );
     } else if (e.key === "Enter" && activeIndex >= 0) {
       const selected = suggestions[activeIndex];
@@ -63,16 +63,18 @@ const SearchBar = ({ searchTerm, setSearchTerm, suggestions }) => {
   };
 
   const handleBlur = () => {
-    // Delay hiding to allow item click
     setTimeout(() => setShowSuggestions(false), 100);
   };
 
   return (
-    <div className="relative w-full md:w-1/2">
+    <div className="relative w-full md:w-[40%] lg:w-[40%]">
+      <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
       <input
         type="text"
-        placeholder="Search by name..."
-        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+        placeholder="Search countries..."
+        className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 dark:border-gray-700 
+        bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm 
+        focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         onFocus={() => setShowSuggestions(true)}
@@ -83,7 +85,7 @@ const SearchBar = ({ searchTerm, setSearchTerm, suggestions }) => {
       {showSuggestions && (
         <ul
           ref={listRef}
-          className="absolute z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-1 w-full rounded shadow max-h-64 overflow-y-auto"
+          className="absolute z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mt-1 w-full rounded-xl shadow max-h-64 overflow-y-auto"
         >
           {searchTerm.length > 0 && suggestions.length > 0 ? (
             suggestions.map((s, idx) => (

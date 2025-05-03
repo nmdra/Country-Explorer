@@ -20,7 +20,9 @@ import {
   removeFromFavorites,
   fetchUserFavorites,
 } from "../utils/api.js";
+import { useAuth } from "../context/AuthContext";
 
+// Track search query (ensure tracking works)
 const trackCountrySearch = async (cca3) => {
   try {
     await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/trending/track`, {
@@ -33,12 +35,14 @@ const trackCountrySearch = async (cca3) => {
   }
 };
 
+// Fetch country details
 const fetchCountryDetails = async (code) => {
   const res = await fetch(`https://restcountries.com/v3.1/alpha/${code}`);
   const data = await res.json();
   return data[0];
 };
 
+// Fetch border countries
 const fetchBorderCountries = async (codes) => {
   const query = codes.join(",");
   const res = await fetch(
@@ -47,6 +51,7 @@ const fetchBorderCountries = async (codes) => {
   return res.json();
 };
 
+// Loading skeleton
 const Skeleton = ({ className = "" }) => (
   <div
     className={`bg-gray-200 dark:bg-gray-700 animate-pulse rounded ${className}`}
@@ -56,6 +61,7 @@ const Skeleton = ({ className = "" }) => (
 const CountryDetails = () => {
   const { code } = useParams();
   const queryClient = useQueryClient();
+  const { userEmail } = useAuth(); // Use `userEmail` instead of `user` to ensure you're tracking the right data
 
   const {
     data: country,
@@ -73,32 +79,51 @@ const CountryDetails = () => {
   });
 
   const { data: favorites = [], refetch: refetchFavorites } = useQuery({
-    queryKey: ["favorites"],
+    queryKey: ["favorites", userEmail], // Fetch only if logged in
     queryFn: fetchUserFavorites,
+    enabled: !!userEmail, // Only fetch if userEmail is available (i.e., logged in)
     staleTime: 0,
   });
 
-  const isFavorite = favorites.includes(code);
+  const isFavorite = favorites.includes(code); // Assuming favorites is an array of country codes (cca3)
 
   const addFavoriteMutation = useMutation({
     mutationFn: () => addToFavorites(code),
     onSuccess: () => {
       toast.success("Added to favorites!");
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["favorites", userEmail] }); // Invalidate favorites query
+      refetchFavorites(); // Explicitly refetch favorites
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err) => {
+      if (err?.response?.status === 403) {
+        toast.error("You must log in to add favorites.");
+      } else {
+        toast.error(err.message);
+      }
+    },
   });
 
   const removeFavoriteMutation = useMutation({
     mutationFn: () => removeFromFavorites(code),
     onSuccess: () => {
       toast.success("Removed from favorites!");
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["favorites", userEmail] }); // Invalidate favorites query
+      refetchFavorites(); // Explicitly refetch favorites
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err) => {
+      if (err?.response?.status === 403) {
+        toast.error("You must log in to remove favorites.");
+      } else {
+        toast.error(err.message);
+      }
+    },
   });
 
   const handleFavoriteToggle = () => {
+    if (!userEmail) {
+      toast.error("You must log in to add favorites.");
+      return;
+    }
     if (!country) return;
     isFavorite ? removeFavoriteMutation.mutate() : addFavoriteMutation.mutate();
   };
@@ -150,6 +175,7 @@ const CountryDetails = () => {
         nameOfficial={country.name.official}
       />
 
+      {/* Country details */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 space-y-4">
         <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
           Summary

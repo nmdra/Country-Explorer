@@ -16,7 +16,9 @@ const TrendingCountries = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const res = await fetch(`/api/trending?limit=5`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/trending?limit=5`
+        );
         const data = await res.json();
         const sortedTrending = (data.trending || []).sort(
           (a, b) => b.count - a.count
@@ -61,7 +63,7 @@ const TrendingCountries = () => {
   return (
     <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
       <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-        🔥 Trending Countries Today
+        🔥 Top Searched Countries Today
       </h3>
 
       {loading ? (

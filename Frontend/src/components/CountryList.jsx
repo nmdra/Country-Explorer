@@ -10,7 +10,7 @@ const ITEMS_PER_PAGE = 24;
 
 const fetchCountries = async () => {
   const res = await fetch(
-    "https://restcountries.com/v3.1/all?fields=name,flags,region,languages,cca3",
+    "https://restcountries.com/v3.1/all?fields=name,flags,region,languages,cca3,currencies"
   );
   return res.json();
 };
@@ -24,19 +24,29 @@ const CountryList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [regionFilter, setRegionFilter] = useState("All");
   const [languageFilter, setLanguageFilter] = useState("All");
+  const [currencyFilter, setCurrencyFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Build region/language lists
+  // Build region/language/currency lists
   const regions = Array.from(
-    new Set(data?.map((c) => c.region).filter(Boolean)),
+    new Set(data?.map((c) => c.region).filter(Boolean))
   ).sort();
 
   const languages = Array.from(
     new Set(
       data
         ?.flatMap((c) => Object.values(c.languages || {}))
-        .filter((lang) => typeof lang === "string"),
-    ),
+        .filter((lang) => typeof lang === "string")
+    )
+  ).sort();
+
+  const currencies = Array.from(
+    new Set(
+      data
+        ?.flatMap((c) => Object.values(c.currencies || {}))
+        .map((currency) => currency?.name)
+        .filter(Boolean)
+    )
   ).sort();
 
   // Filter countries
@@ -53,20 +63,28 @@ const CountryList = () => {
         languageFilter === "All" ||
         Object.values(country.languages || {}).includes(languageFilter);
 
-      return matchesSearch && matchesRegion && matchesLanguage;
+      const matchesCurrency =
+        currencyFilter === "All" ||
+        Object.values(country.currencies || {}).some((currency) =>
+          currency.name.toLowerCase().includes(currencyFilter.toLowerCase())
+        );
+
+      return (
+        matchesSearch && matchesRegion && matchesLanguage && matchesCurrency
+      );
     }) || [];
 
   const totalPages = Math.ceil(filteredCountries.length / ITEMS_PER_PAGE);
   const paginatedCountries = filteredCountries.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
   );
 
   const suggestions =
     searchTerm.length > 0
       ? data
           ?.filter((c) =>
-            c.name.common.toLowerCase().startsWith(searchTerm.toLowerCase()),
+            c.name.common.toLowerCase().startsWith(searchTerm.toLowerCase())
           )
           .slice(0, 5)
       : [];
@@ -94,12 +112,18 @@ const CountryList = () => {
             setLanguageFilter(val);
             setCurrentPage(1);
           }}
+          currencyFilter={currencyFilter}
+          setCurrencyFilter={(val) => {
+            setCurrencyFilter(val);
+            setCurrentPage(1);
+          }}
           regions={regions}
           languages={languages}
+          currencies={currencies}
         />
       </div>
 
-      {/* 🔥 Trending Countries */}
+      {/* Trending Countries */}
       <TrendingCountries />
 
       {/* Country Grid */}

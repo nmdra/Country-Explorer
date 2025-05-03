@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaBars, FaTimes, FaHome, FaStar } from "react-icons/fa"; // Import React Icons
+import { MdCompareArrows } from "react-icons/md"; // For "Compare Plans" (optional, you can use any icon you like)
 import { useAuth } from "../context/AuthContext";
 import DarkModeToggle from "./DarkModeToggle";
 
 const Header = () => {
   const { userEmail, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false); // State to manage mobile nav
   const menuRef = useRef(null);
   const navigate = useNavigate();
 
@@ -24,20 +26,44 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     setMenuOpen(false);
+    setNavOpen(false); // Close mobile nav when logging out
     navigate("/");
   };
 
   return (
     <header className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 shadow-md relative z-50">
-      <Link to="/">
-        <h1 className="text-xl font-bold text-gray-800 dark:text-white hover:underline pr-2.5">
-          Country Explorer
-        </h1>
+      <Link
+        to="/"
+        className="text-xl font-bold text-gray-800 dark:text-white hover:underline pr-2.5"
+      >
+        Country Explorer
       </Link>
 
+      {/* Dark Mode Toggle */}
       <DarkModeToggle />
 
-      <div className="flex items-center gap-4 ml-auto">
+      {/* Mobile Hamburger Icon */}
+      <div className="lg:hidden flex items-center gap-4">
+        <button
+          onClick={() => setNavOpen(!navOpen)}
+          className="text-2xl text-gray-700 dark:text-gray-200"
+        >
+          {navOpen ? <FaTimes /> : <FaBars />}
+        </button>
+      </div>
+
+      {/* Navigation Links */}
+      <div
+        className={`lg:flex items-center gap-4 ml-auto ${navOpen ? "block" : "hidden"} lg:block`}
+      >
+        <Link
+          to="/compare"
+          className="flex items-center gap-2 px-3 py-1 text-sm rounded bg-purple-600 text-white hover:bg-purple-700"
+        >
+          <MdCompareArrows className="text-xl" /> {/* Compare Countries Icon */}
+          Compare Countries
+        </Link>
+
         {userEmail ? (
           <div className="relative" ref={menuRef}>
             <button
@@ -57,13 +83,13 @@ const Header = () => {
                   className="block px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                   onClick={() => setMenuOpen(false)}
                 >
-                  ⭐ Favorites
+                  <FaStar className="inline mr-2" /> Favorites
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  🚪 Logout
+                  <FaUserCircle className="inline mr-2" /> Logout
                 </button>
               </div>
             )}
