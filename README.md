@@ -128,6 +128,7 @@ npm run dev
 * **Vitest**: A fast unit test framework for JavaScript/TypeScript. It supports features like mocking, assertions, and coverage reporting.
 * **React Testing Library**: A set of utilities for testing React components. It encourages testing components the way users would interact with them.
 * **Jest**: If you're using Jest, it will handle running tests, assertions, and coverage.
+* **Cypress**: For E2E and UI Testing
 
 ### Running Tests
 
