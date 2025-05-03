@@ -12,6 +12,7 @@ A modern, responsive web app to explore country details with maps, flags, and fa
     - [Internal APIs](#internal-apis)
   - [Getting Started (Local Development)](#getting-started-local-development)
   - [Production Deployment](#production-deployment)
+    - [Enviroment Variables](#enviroment-variables)
     - [Docker Compose Configuration](#docker-compose-configuration)
   - [Credits](#credits)
 
@@ -32,12 +33,21 @@ A modern, responsive web app to explore country details with maps, flags, and fa
 - 🌗 Dark mode support
 - ⚡ Built with React 19 + Vite + Tailwind CSS
 - 🔥 **Trending Countries** – discover what's most viewed today
+- ⚖ **Comapare two countries with charts**
 
->[!NOTE] 
-> When a user visits a country’s detail page, a backend API tracks the country’s `cca3` code in Redis, using a key for the current date.
-> - Redis sorted sets (`ZINCRBY`) are used to count views per country per day.
-> - The data automatically expires after 24 hours to reset daily.
-> - A frontend widget fetches and displays the top 5 most-viewed countries for the current day.
+> [!NOTE]
+>
+> ### Trending Countries Implementation
+>
+> When a user views a country’s detail page, the backend tracks its `cca3` code using Redis.
+>
+> * A **Redis sorted set** stores daily view counts with `ZINCRBY`.
+> * Data is stored under a **date-based key** and set to **expire after 24 hours**, ensuring daily reset.
+> * The frontend fetches and displays the **top 5 most-viewed countries** for the current day.
+> 
+> [Redis Documentation](https://redis.io/docs/latest/develop/data-types/sorted-sets/)   
+> [Example](https://github.com/nmdra/Redis-Learn/blob/main/Leaderboard/leaderboard.go)
+
 
 ## Tech Stack
 
@@ -62,6 +72,7 @@ A modern, responsive web app to explore country details with maps, flags, and fa
 5. **[Ioredis](https://github.com/luin/ioredis)** – Advanced Redis client with clustering and pub/sub support.
 6. **[Sequelize](https://sequelize.org/)** – Promise-based ORM for PostgreSQL and other relational databases.
 7. **[Argon2](https://www.npmjs.com/package/argon2)** – Secure password hashing algorithm used for storing user credentials.
+8. **[rechart]()** - Charts library
 
 ## APIs Used
 
@@ -107,7 +118,7 @@ npm run dev
 
 ## Production Deployment
 
-📦 **Docker Image:** [GitHub Container Registry](https://github.com/nmdra?tab=packages&repo_name=Country-Explorer)  
+📦 **Docker Images:** [GitHub Container Registry](https://github.com/nmdra?tab=packages&repo_name=Country-Explorer)  
 
 This will start the following services:
 
@@ -120,6 +131,16 @@ This will start the following services:
 
 > Optional: You can expose `5432` or `6379` for Postgres/Redis if needed.
 
+### Enviroment Variables
+
+**Backend**
+
+```plaintext
+PORT=5000
+DB_URL=<postgres url>
+REDIS_URL=redis://<redis hostname>:6379
+JWT_SECRET=super_secret
+```
 ### Docker Compose Configuration
 
 ```yaml
@@ -131,8 +152,9 @@ services:
       target: development 
     container_name: country-backend
     hostname: country-backend
+    restart: always
     ports:
-      - "5000:5000"
+      - "5000:5000" # Optinal for production
     env_file:
       - ./Backend/.env
     depends_on:
@@ -148,6 +170,7 @@ services:
       target: production 
     container_name: country-frontend
     hostname: country-frontend
+    restart: always
     ports:
       - "80:80"
     networks:
@@ -159,9 +182,9 @@ services:
     hostname: postgres
     restart: always
     environment:
-      POSTGRES_DB: countries
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres # Change this
+      POSTGRES_USER: postgres # Change this
+      POSTGRES_PASSWORD: postgres # Change this
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
