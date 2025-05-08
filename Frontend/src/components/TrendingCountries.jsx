@@ -63,7 +63,7 @@ const TrendingCountries = () => {
   return (
     <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
       <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-        🔥 Top Searched Countries Today
+        🔥 Top Searched Countries in This Week
       </h3>
 
       {loading ? (

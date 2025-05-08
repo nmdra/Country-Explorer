@@ -14,7 +14,7 @@ router.post("/track", async (req, res) => {
 
   const key = getTodayKey();
   await redis.zincrby(key, 1, cca3);
-  await redis.expire(key, 86400);
+  await redis.expire(key, 604800);
   res.json({ message: "Tracked" });
 });
 
