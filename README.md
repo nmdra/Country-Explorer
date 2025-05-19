@@ -1,13 +1,4 @@
-| Name                | Registration No | Batch            |
-|---------------------|-----------------|------------------|
-| Dharmasiri I.D.N.D  | IT22254320      | Y3S1.SE.WD.01    |
----
 # Country Explorer
-
-> [!NOTE]
-> This repository is a **mirrored version** of the main repository located at: [github.com/nmdra/Country-Explorer](https://github.com/nmdra/Country-Explorer).
-> 
-> Some features, such as **GitHub Actions**, **Docker Image builds** and **Deployments**  are not available in this mirrored repo.For details on those features, please refer to the main repository.
 
 A modern, responsive web app to explore country details with maps, flags, and facts using public APIs.
 
@@ -35,7 +26,7 @@ A modern, responsive web app to explore country details with maps, flags, and fa
 - [country-explorer.nimendra.xyz](https://country-explorer.nimendra.xyz) 🟢
 
 > [!IMPORTANT]
-> For detailed deployment instructions, please refer to the [Production Deployment](#deployment) section.
+> For detailed deployment instructions, please refer to the [Production Deployment](#production-deployment) section.
 
 ## Features
 
